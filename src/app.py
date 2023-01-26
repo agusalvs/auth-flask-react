@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, People, Starships, Planets, Likes
+from models import db, User, People, Starships, Planets, Favorites
 #from models import Person
 
 app = Flask(__name__)
@@ -36,34 +36,95 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-@app.route('/user', methods=['GET'])
-def handle_hello():
 
-    response_body = {
-        "msg": "Hello, this is your GET /user response "
-    }
+#ACÁ EMPIEZAN LAS RUTAS
 
-    return jsonify(response_body), 200
-
-# this only runs if `$ python src/app.py` is executed
-if __name__ == '__main__':
-    PORT = int(os.environ.get('PORT', 3000))
-    app.run(host='0.0.0.0', port=PORT, debug=False)
-
-
-# from flask import Flask, jsonify, request
-
-# app = Flask(__name__)
-
-# todos = [
-#     { "label": "My first task", "done": False },
-#     { "label": "My second task", "done": False }
+# people = [
+#     {"id": 1, "name": "Luke Skywalker", "birth_year": "19 BBY", "homeworld": "https://www.swapi.tech/api/planets/1/", "starships": "https://www.swapi.tech/api/starships/12/"},
+#     {"id": 3, "name": "R2-D2", "birth_year": "33BBY", "homeworld": "https://www.swapi.tech/api/planets/8"}
 # ]
 
-# @app.route('/todos', methods=['GET'])
-# def hello_world():
-#     json_text = jsonify(todos)
-#     return json_text
+# planets = [
+#     {"id": 8, "name": "Naboo", "population": "4500000000", "gravity": "1 standard", "climate": "temperate"},
+#     {"id": 5, "name": "Dagobah", "population": "unknown", "gravity": "N/A", "climate": "murky"}
+# ]
+
+# user = [
+#     {"id": 1, "email": "uncorreo@gmail.com"},
+#     {"id": 2, "email": "otrocorreo@gmail.com"}
+# ]
+
+# favorites = [
+#     {"user_id": "2", "people_id": "3", "starships_id": "null", "planets_id": "null"},
+#     {"user_id": "2", "people_id": "null", "starships_id": "null", "planets_id": "8"}
+# ]
+
+@app.route('/people', methods=['GET'])
+def get_people():
+    allpeople = People.query.all()
+    results = list(map(lambda item: item.serialize(),allpeople))
+
+    return jsonify(results), 200
+
+# @app.route('/user/<int:user_id>', methods=['GET'])
+# def get_info_user(user_id):
+    
+#     user = User.query.filter_by(id=user_id).first()
+#     return jsonify(user.serialize()), 200
+@app.route('/people/<int:people_id>', methods=['GET'])
+def get_people_id(people_id):
+
+    people = People.query.filter_by(id=people_id).first()
+    return jsonify(people.serialize()), 200
+
+
+@app.route('/planets', methods=['GET'])
+def get_planets():
+
+    allplanets = Planets.query.all()
+    results = list(map(lambda item: item.serialize(),allplanets))
+
+    return jsonify(results), 200
+
+
+@app.route('/planets/<int:planets_id>', methods=['GET'])
+def get_planets_id(planets_id):
+
+    planet = Planets.query.filter_by(id=planets_id).first()
+    return jsonify(planet.serialize()), 200
+
+@app.route('/user', methods=['GET'])
+def get_user():
+
+    allusers = User.query.all()
+    results = list(map(lambda item: item.serialize(),allusers))
+
+    return jsonify(results), 200
+
+@app.route('/user/favorites', methods=['GET'])
+def get_user_favorites():
+
+    planet = Planets.query.filter_by(id=planets_id).first()
+    return jsonify(planet.serialize()), 200
+
+
+@app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
+def addfav():
+
+    allfavorites = User.query.all()
+    favorites.add(planet_id)
+    results = list(map(lambda item: item.serialize(),allfavorites))
+    print("Incoming request with the following body", allfavorites)
+
+    return jsonify(results), 200
+
+# @app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
+# def add_new_fav_planet():
+
+#     request_body = request.data
+#     todos.append(request.get_json(force=True))
+#     print("Incoming request with the following body", request_body)
+#     return jsonify(todos)
 
 # @app.route('/todos', methods=['POST'])
 # def add_new_todo():
@@ -72,12 +133,13 @@ if __name__ == '__main__':
 #     print("Incoming request with the following body", request_body)
 #     return jsonify(todos)
 
-# @app.route('/todos/<int:position>', methods=['DELETE'])
-# def delete_todo(position):
-#     todos.pop(position)
-#     print("This is the position to delete: ",position)
-#     return jsonify(todos)
 
-# # These two lines should always be at the end of your app.py file.
-# if __name__ == '__main__':
-#   app.run(host='0.0.0.0', port=3245, debug=True)
+
+
+#ACÁ TERMINAN LAS RUTAS
+
+
+# this only runs if `$ python src/app.py` is executed
+if __name__ == '__main__':
+    PORT = int(os.environ.get('PORT', 3000))
+    app.run(host='0.0.0.0', port=PORT, debug=False)

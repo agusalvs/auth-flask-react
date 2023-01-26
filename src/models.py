@@ -6,7 +6,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
-    likes = db.relationship('Likes', backref='user', lazy=True)
+    favorites = db.relationship('Favorites', backref='user', lazy=True)
 
     def __repr__(self):
         return '<User %r>' % self.id
@@ -27,7 +27,7 @@ class People(db.Model):
     birth_year = db.Column(db.String(250), nullable=False)
     homeworld = db.Column(db.String(250), nullable=False)
     starship = db.Column(db.String(250), nullable=False)
-    likes = db.relationship('Likes', backref='people', lazy=True)
+    favorites = db.relationship('Favorites', backref='people', lazy=True)
 
     def __repr__(self):
         return '<People %r>' % self.id
@@ -50,7 +50,7 @@ class Starships(db.Model):
     model = db.Column(db.String(250), nullable=False)
     starship_class = db.Column(db.String(250), nullable=False)
     passengers = db.Column(db.String(250), nullable=False)
-    likes = db.relationship('Likes', backref='starships', lazy=True)
+    favorites = db.relationship('Favorites', backref='starships', lazy=True)
 
 
     def __repr__(self):
@@ -74,7 +74,7 @@ class Planets(db.Model):
     population = db.Column(db.String(250), nullable=False)
     gravity = db.Column(db.String(250), nullable=False)
     climate = db.Column(db.String(250), nullable=False)
-    likes = db.relationship('Likes', backref='planets', lazy=True)
+    favorite = db.relationship('Favorites', backref='planets', lazy=True)
 
     def __repr__(self):
         return '<Planets %r>' % self.id
@@ -88,7 +88,7 @@ class Planets(db.Model):
             "climate": self.climate,
         }
 
-class Likes(db.Model):
+class Favorites(db.Model):
     # Here we define columns for the table people
     # Notice that each column is also a normal Python instance attribute.
     id = db.Column(db.Integer, primary_key=True)
@@ -98,7 +98,7 @@ class Likes(db.Model):
     planets_id = db.Column(db.Integer, db.ForeignKey('planets.id'))
 
     def __repr__(self):
-        return '<Likes %r>' % self.id
+        return '<Favorites %r>' % self.id
 
     def serialize(self):
         return {
