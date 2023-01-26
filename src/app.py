@@ -101,37 +101,22 @@ def get_user():
 
     return jsonify(results), 200
 
-@app.route('/user/favorites', methods=['GET'])
-def get_user_favorites():
+# @app.route('/user/favorites', methods=['GET'])
+# def get_user_favorites():
 
-    planet = Planets.query.filter_by(id=planets_id).first()
-    return jsonify(planet.serialize()), 200
+#     favs = User.query.filter_by(id=user_id).first()
+#     return jsonify(favs.serialize()), 200
 
-
-@app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
-def addfav():
-
-    allfavorites = User.query.all()
-    favorites.add(planet_id)
-    results = list(map(lambda item: item.serialize(),allfavorites))
-    print("Incoming request with the following body", allfavorites)
-
-    return jsonify(results), 200
 
 # @app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
-# def add_new_fav_planet():
+# def addfav():
 
-#     request_body = request.data
-#     todos.append(request.get_json(force=True))
-#     print("Incoming request with the following body", request_body)
-#     return jsonify(todos)
+#     allfavorites = User.query.all()
+#     favorites.add(planet_id)
+#     results = list(map(lambda item: item.serialize(),allfavorites))
+#     print("Incoming request with the following body", allfavorites)
 
-# @app.route('/todos', methods=['POST'])
-# def add_new_todo():
-#     request_body = request.data
-#     todos.append(request.get_json(force=True))
-#     print("Incoming request with the following body", request_body)
-#     return jsonify(todos)
+#     return jsonify(results), 200
 
 
 
