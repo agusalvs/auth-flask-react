@@ -66,11 +66,6 @@ def get_people():
 
     return jsonify(results), 200
 
-# @app.route('/user/<int:user_id>', methods=['GET'])
-# def get_info_user(user_id):
-    
-#     user = User.query.filter_by(id=user_id).first()
-#     return jsonify(user.serialize()), 200
 @app.route('/people/<int:people_id>', methods=['GET'])
 def get_people_id(people_id):
 
@@ -101,23 +96,142 @@ def get_user():
 
     return jsonify(results), 200
 
-# @app.route('/user/favorites', methods=['GET'])
-# def get_user_favorites():
+@app.route('/user/<int:user_id>/favorites', methods=['GET'])
+def get_user_favorites(user_id):
 
-#     favs = User.query.filter_by(id=user_id).first()
-#     return jsonify(favs.serialize()), 200
+    favs = Favorites.query.filter_by(user_id=user_id).all()
+    results = list(map(lambda item: item.serialize(),favs))
+
+    return jsonify(results), 200
 
 
-# @app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
-# def addfav():
+# [POST] /favorite/planet/<int:planet_id> Add a new favorite planet to the current user with the planet id = planet_id
 
-#     allfavorites = User.query.all()
-#     favorites.add(planet_id)
-#     results = list(map(lambda item: item.serialize(),allfavorites))
-#     print("Incoming request with the following body", allfavorites)
+@app.route('/user/<int:user_id>/favorites/planets', methods=['POST'])
+def add_planet_favorites(user_id):
 
-#     return jsonify(results), 200
+    #me traigo el body
+    request_body = request.json
+    #veo lo que me trae
+    print(request_body)
+    #traigo lo que necesito y lo muestro en consola
+    print(request_body['planets_id'])
+    
+    # #Class(propiedades a las que le agrego valores)
+    #instanciar el obejto a partir de la clase
+    new_fav_planet = Favorites(user_id = user_id, people_id = None, starships_id = None, planets_id = request_body['planets_id']) #lo que tengo dentro del print de la línea 118 lo llevo a mi variable
 
+    favs = Favorites.query.filter_by(user_id=user_id, planets_id=request_body['planets_id']).first()
+    print(favs)
+
+    # si el usuario 1 tiene el planeta 1 le respondo que eso ya existe
+    if favs is None:
+        new_fav_planet = Favorites(user_id = user_id, people_id = None, starships_id = None, planets_id = request_body['planets_id']) #lo que tengo dentro del print de la línea 118 lo llevo a mi variable
+        db.session.add(new_fav_planet)
+        db.session.commit()
+
+        return jsonify({new_fav_planet}), 200    
+
+    return jsonify({'msg': 'el favorito ya existe'}), 400
+
+# TERMINA EL POST DE PLANET
+
+# EMPIEZA EL POST DE PEOPLE
+@app.route('/user/<int:user_id>/favorites/people', methods=['POST'])
+def add_people_favorites(user_id):
+
+    #me traigo el body
+    request_body = request.json
+    #veo lo que me trae
+    print(request_body)
+    #traigo lo que necesito y lo verifico mostrándolo en consola
+    print(request_body['people_id'])
+    
+    # #Class(propiedades a las que le agrego valores)
+    #instanciar el obejto a partir de la clase
+    new_fav_people = Favorites(user_id = user_id, people_id = request_body['people_id'], starships_id = None, planets_id = None) #lo que tengo dentro del print de la línea 118 lo llevo a mi variable
+
+    favs = Favorites.query.filter_by(user_id=user_id, people_id=request_body['people_id']).first()
+    print(favs)
+
+    # si el usuario 1 tiene el planeta 1 le respondo que eso ya existe
+    if favs is None:
+        new_fav_people = Favorites(user_id = user_id, people_id = request_body['people_id'], starships_id = None, planets_id = None) #lo que tengo dentro del print de la línea 118 lo llevo a mi variable
+        db.session.add(new_fav_people)
+        db.session.commit()
+
+        return jsonify({new_fav_people}), 200    
+
+    return jsonify({'msg': 'el favorito ya existe'}), 400
+
+# TERMINA EL POST DE PEOPLE
+
+
+# #EMPIEZA EL DELETE DE PLANET
+
+@app.route('/user/<int:user_id>/favorites/planets', methods=['DELETE'])
+def delete_planet_favorites(user_id):
+
+    #me traigo el body
+    request_body = request.json
+    #veo lo que me trae
+    print(request_body)
+    #traigo lo que necesito y lo verifico mostrándolo en consola
+    print(request_body['planets_id'])
+    
+    # #Class(propiedades a las que le agrego valores)
+    #instanciar el obejto a partir de la clase
+    # delete_fav_planet = Favorites(user_id = user_id, people_id = None, starships_id = None, planets_id = request_body['planets_id']) #lo que tengo dentro del print de la línea 118 lo llevo a mi variable
+
+    favs = Favorites.query.filter_by(user_id=user_id, planets_id=request_body['planets_id']).first()
+    print(favs)
+
+    # si el usuario 1 tiene el planeta 1 le respondo que eso ya existe
+    if favs is not None:
+        # delete_fav_planet = Favorites(user_id = user_id, people_id = None, starships_id = None, planets_id = request_body['planets_id']) #lo que tengo dentro del print de la línea 118 lo llevo a mi variable
+        db.session.delete(favs)
+        db.session.commit()
+
+        # results = list(map(lambda item: item.serialize(),allplanets))
+
+        return jsonify({'msg': 'eliminaste el favorito correctamente'}), 200    
+
+    return jsonify({'msg': 'No existe el favorito a eliminar'}), 400
+
+# #TERMINA EL DELETE DE PLANET
+
+# #EMPIEZA EL DELETE DE PEOPLE
+
+@app.route('/user/<int:user_id>/favorites/planets', methods=['DELETE'])
+def delete_planet_favorites(user_id):
+
+    #me traigo el body
+    request_body = request.json
+    #veo lo que me trae
+    print(request_body)
+    #traigo lo que necesito y lo verifico mostrándolo en consola
+    print(request_body['planets_id'])
+    
+    # #Class(propiedades a las que le agrego valores)
+    #instanciar el obejto a partir de la clase
+    # delete_fav_planet = Favorites(user_id = user_id, people_id = None, starships_id = None, planets_id = request_body['planets_id']) #lo que tengo dentro del print de la línea 118 lo llevo a mi variable
+
+    favs = Favorites.query.filter_by(user_id=user_id, planets_id=request_body['planets_id']).first()
+    print(favs)
+
+    # si el usuario 1 tiene el planeta 1 le respondo que eso ya existe
+    if favs is not None:
+        # delete_fav_planet = Favorites(user_id = user_id, people_id = None, starships_id = None, planets_id = request_body['planets_id']) #lo que tengo dentro del print de la línea 118 lo llevo a mi variable
+        db.session.delete(favs)
+        db.session.commit()
+
+        # results = list(map(lambda item: item.serialize(),allplanets))
+
+        return jsonify({'msg': 'eliminaste el favorito correctamente'}), 200    
+
+    return jsonify({'msg': 'No existe el favorito a eliminar'}), 400
+
+# #TERMINA EL DELETE DE PEOPLE
 
 
 
