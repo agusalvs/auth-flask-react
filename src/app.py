@@ -202,21 +202,21 @@ def delete_planet_favorites(user_id):
 
 # #EMPIEZA EL DELETE DE PEOPLE
 
-@app.route('/user/<int:user_id>/favorites/planets', methods=['DELETE'])
-def delete_planet_favorites(user_id):
+@app.route('/user/<int:user_id>/favorites/people', methods=['DELETE'])
+def delete_people_favorites(user_id):
 
     #me traigo el body
     request_body = request.json
     #veo lo que me trae
     print(request_body)
     #traigo lo que necesito y lo verifico mostrándolo en consola
-    print(request_body['planets_id'])
+    print(request_body['people_id'])
     
     # #Class(propiedades a las que le agrego valores)
     #instanciar el obejto a partir de la clase
     # delete_fav_planet = Favorites(user_id = user_id, people_id = None, starships_id = None, planets_id = request_body['planets_id']) #lo que tengo dentro del print de la línea 118 lo llevo a mi variable
 
-    favs = Favorites.query.filter_by(user_id=user_id, planets_id=request_body['planets_id']).first()
+    favs = Favorites.query.filter_by(user_id=user_id, people_id=request_body['people_id']).first()
     print(favs)
 
     # si el usuario 1 tiene el planeta 1 le respondo que eso ya existe
