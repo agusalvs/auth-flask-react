@@ -9,6 +9,7 @@ from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
 from models import db, User, People, Starships, Planets, Favorites
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 #from models import Person
 
 # "holi"
@@ -28,6 +29,10 @@ db.init_app(app)
 CORS(app)
 setup_admin(app)
 
+# Setup the Flask-JWT-Extended extension
+app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
+jwt = JWTManager(app)
+
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
@@ -38,28 +43,7 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-
 #ACÁ EMPIEZAN LAS RUTAS
-
-# people = [
-#     {"id": 1, "name": "Luke Skywalker", "birth_year": "19 BBY", "homeworld": "https://www.swapi.tech/api/planets/1/", "starships": "https://www.swapi.tech/api/starships/12/"},
-#     {"id": 3, "name": "R2-D2", "birth_year": "33BBY", "homeworld": "https://www.swapi.tech/api/planets/8"}
-# ]
-
-# planets = [
-#     {"id": 8, "name": "Naboo", "population": "4500000000", "gravity": "1 standard", "climate": "temperate"},
-#     {"id": 5, "name": "Dagobah", "population": "unknown", "gravity": "N/A", "climate": "murky"}
-# ]
-
-# user = [
-#     {"id": 1, "email": "uncorreo@gmail.com"},
-#     {"id": 2, "email": "otrocorreo@gmail.com"}
-# ]
-
-# favorites = [
-#     {"user_id": "2", "people_id": "3", "starships_id": "null", "planets_id": "null"},
-#     {"user_id": "2", "people_id": "null", "starships_id": "null", "planets_id": "8"}
-# ]
 
 @app.route('/people', methods=['GET'])
 def get_people():
@@ -97,6 +81,61 @@ def get_user():
     results = list(map(lambda item: item.serialize(),allusers))
 
     return jsonify(results), 200
+
+
+@app.route('/signup', methods=['POST'])
+def reg_user():
+
+    #me traigo el body
+    request_body = request.json
+    #veo lo que me trae
+    print(request_body)
+    
+    users = User.query.filter_by(email=request_body['email']).first()
+
+    # si el usuario no fue creado, lo crea; de lo contrario, envía el mensaje que ya fue creado
+    if users is None:
+        new_user = User(email = request_body['email'], password = request_body['password']) #lo que tengo dentro del print de la línea 118 lo llevo a mi variable
+        db.session.add(new_user)
+        db.session.commit()
+
+        # print(new_user.serialize())
+
+        return jsonify({'msg': 'el usuario con el email ' +request_body['email']+ ' ha sido creado exitosamente'}), 200    
+
+    return jsonify({'msg': 'el usuario con el email ' +request_body['email']+ ' ya existe'})
+
+
+# Create a route to authenticate your users and return JWTs. The
+# create_access_token() function is used to actually generate the JWT.
+@app.route("/login", methods=["POST"])
+def login():
+
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+
+    users = User.query.filter_by(email=email).first()
+    # print(users)
+
+    if users is None:
+        return jsonify({"msg": "You need to signup"}), 404
+    if password != users.password:
+        return jsonify({"msg": "Bad email or password"}), 401
+
+    access_token = create_access_token(identity=email)
+    return jsonify(access_token=access_token)
+    # return jsonify({'msg': 'funciona'})
+
+
+# Protect a route with jwt_required, which will kick out requests
+# without a valid JWT present.
+@app.route("/profile", methods=["GET"])
+@jwt_required()
+def protected():
+    # Access the identity of the current user with get_jwt_identity
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200
+
 
 @app.route('/user/<int:user_id>/favorites', methods=['GET'])
 def get_user_favorites(user_id):
