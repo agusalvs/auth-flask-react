@@ -95,7 +95,7 @@ def reg_user():
 
     # si el usuario no fue creado, lo crea; de lo contrario, envía el mensaje que ya fue creado
     if users is None:
-        new_user = User(email = request_body['email'], password = request_body['password']) #lo que tengo dentro del print de la línea 118 lo llevo a mi variable
+        new_user = User(email = request_body['email'], password = request_body['password'], username = request_body['username'], fullname = request_body['fullname']) #lo que tengo dentro del print de la línea 118 lo llevo a mi variable
         db.session.add(new_user)
         db.session.commit()
 
@@ -103,7 +103,7 @@ def reg_user():
 
         return jsonify({'msg': 'el usuario con el email ' +request_body['email']+ ' ha sido creado exitosamente'}), 200    
 
-    return jsonify({'msg': 'el usuario con el email ' +request_body['email']+ ' ya existe'})
+    return jsonify({'msg': 'This user has already been created'}), 400
 
 
 # Create a route to authenticate your users and return JWTs. The
